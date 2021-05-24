@@ -1,0 +1,72 @@
+ new***************************
+****     ECE 5362      ****
+**** Machine Problem 2 ****
+****      He Zhang     ****
+***************************
+*** Start fetch cycle ***
+ st=0   rt='[pc]-> mar'         imar rac=1 rn=3
+ st=1   rt='[[mar]]-> mdr'      read
+ st=2   rt='[mdr] -> ir'        omdr iir
+ st=3   rt='[pc]+1 -> q'        rac=1 rn=3 ib p1 oadder
+ st=4   rt='[q] -> pc'          oq wac=1 wn=3
+        cond='ir158'  value=0 nst=10
+        cond='ir1512' value=0 nst=60
+        nst=10
+
+*** If any instructions are present except HALT or INC, a halt will occur. ***
+*** HALT execution cycle ***
+ st=10 halt
+
+*** addressing mode selection cycle ***
+ st=60  rt='addr mode'
+        cond='ir64'   value=0 nst=70
+        cond='ir64'   value=1 nst=72
+        cond='ir64'   value=2 nst=72
+        cond='ir64'   value=3 nst=79
+        cond='ir64'   value=4 nst=82
+        cond='ir64'   value=5 nst=89
+
+*** INC R execution cycle ***
+ st=70  rt='[R] + 1 -> q'      rac=3 ib p1 oadder newv newc
+ st=71  rt='[q] -> R'          oq wac=3 newz newn
+        nst=0
+
+*** INC (R) execution cycle ***
+ st=72  rt='[R] -> mar'        rac=3 imar
+ st=73  rt='[[mar]]-> mdr'     read
+ st=74  rt='[mdr] + 1 -> q'    omdr ib p1 oadder newv newc
+ st=75  rt='[q] -> mdr'        oq imdr newz newn
+ st=76  rt='[mdr] -> [mar]'    write
+        cond='ir64'   value=2 nst=77       
+        nst=0
+
+*** INC (R)+ execution cycle ***
+ st=77  rt='[R] + 1 -> q'      rac=3 ib p1 oadder newv newc
+ st=78  rt='[q] -> R'          oq wac=3 newz newn
+        nst=0
+
+*** INC -(R) execution cycle ***
+ st=79  rt='[R] -> t1'         rac=3 it1
+ st=80  rt='[t1] - 1 -> q'     oa comp oadder 
+ st=81  rt='[q] -> [R]'        wac=3 oq
+        nst=72
+
+*** INC n(R) execution cycle ***
+ st=82  rt='[pc] -> mar'       imar rac=1 rn=3
+ st=83  rt='[[mar]] -> mdr'    read
+ st=84  rt='[pc] + 1 -> q'     rac=1 rn=3 ib p1 oadder
+ st=85  rt='[q] -> pc'         wac=1 wn=3 oq
+ st=86  rt='[mdr] -> t1'       omdr it1
+ st=87  rt='[t1] + [R] -> q'   oa rac=3 ib oadder
+ st=88  rt='[q] -> mar'        oq imar
+        nst=73
+
+*** INC n execution cycle ***
+ st=89  rt='[pc] -> mar'       imar rac=1 rn=3
+ st=90  rt='[[mar]] -> mdr'    read
+ st=91  rt='[pc] + 1 -> q'     rac=1 rn=3 ib p1 oadder
+ st=92  rt='[q] -> pc'         wac=1 wn=3 oq
+ st=93  rt='[mdr] -> mar'      omdr imar
+        nst=73
+
+

@@ -1,0 +1,293 @@
+**************************
+****      ECE 5362     ****
+**** Machine Probelm  3 ****
+****      Yinru Chen   ****
+****      Xueji Zhao   ****
+**************************
+
+
+*** start fetch cycle ***
+ st=0   rt='[pc]->mar'	         imar rac=1 rn=3
+ st=1   rt='[[mar]]->mdr'        read
+ st=2   rt='[mdr] -> ir'         omdr iir
+ st=3   rt='[pc]+1 ->q'	         rac=1 rn=3 ib p1 oadder
+ st=4   rt='[q] -> pc'           oq wac=1 wn=3
+
+*** check single or double or halt
+        cond='ir158'   value=0  nst=100
+        cond='ir1512'  value=0  nst=22
+
+*** place src to t4 and addr of src to t5 (for double)***
+ st=5
+        cond='ir108'   value=0  nst=6
+        cond='ir108'   value=1  nst=10
+        cond='ir108'   value=2  nst=10
+        cond='ir108'   value=3  nst=7
+        cond='ir108'   value=4  nst=18
+        cond='ir108'   value=5  nst=18
+        cond='ir108'   value=6  nst=18
+
+
+*** Register ***
+ st=6    rt='[r] -> t4'            rac=2 it4
+         nst=22
+*** Autodecrement ***
+ st=7    rt='[r] -> t1'            rac=2 it1
+ st=8    rt='[t1]-1 -> q'          oa comp oadder
+ st=9    rt='[q] -> t1'            oq wac=2
+*** Register Indirect and Autoincrement ***
+ st=10    rt='[r] -> mar,t5'        rac=2 imar it5
+ st=11    rt='[[mar]] -> mdr'       read
+ st=12    rt='[mdr] -> t4'          omdr it4
+          nst=22
+*** Index ***
+ st=13    rt='[mdr] -> t1'          omdr it1
+ st=14    rt='[t1]+[r] -> q'        rac=2 ib oa oadder
+ st=15    rt='[q] -> mar,t5'        oq imar it5
+          nst=11
+
+*** Abosolute ***
+ st=16    rt='[mdr] -> mar,t5'      omdr imar it5
+          nst=11
+*** Immediate ***
+ st=17    rt='[mdr] -> t4'          omdr it4
+          nst=22
+
+*** fetch 2nd word ***
+ st=18    rt='[pc]->mar'	    imar rac=1 rn=3
+ st=19    rt='[[mar]]->mdr'         read
+ st=20    rt='[pc]+1 ->q'	    rac=1 rn=3 ib p1 oadder
+ st=21    rt='[q] -> pc'            oq wac=1 wn=3
+          cond='ir108'   value=4 nst=13
+          cond='ir108'   value=5 nst=16
+          cond='ir108'   value=6 nst=17  
+          nst=100
+
+
+
+
+
+
+*** place dst in t2 and addr of dst to t3
+ st=22
+        cond='ir64'   value=0  nst=23
+        cond='ir64'   value=1  nst=27
+        cond='ir64'   value=2  nst=27
+        cond='ir64'   value=3  nst=24
+        cond='ir64'   value=4  nst=34
+        cond='ir64'   value=5  nst=34
+
+
+*** Register ***
+ st=23	rt='[r] -> t2'          rac=3 it2
+        nst=38
+
+*** Autodecrement ***
+ st=24	rt='[r] -> t1'          rac=3 it1
+ st=25	rt='[t1] - 1 -> q'      oa comp oadder
+ st=26	rt='[q] -> r'           oq wac=3
+
+*** Register Indirect and Autoincrement ***
+ st=27	rt='[r] -> mar,t3'      rac=3 imar it3
+ st=28	rt='[[mar]] -> mdr'     read
+ st=29	rt='[mdr] -> t2'        omdr it2 
+        nst=38
+
+*** Index ***
+ st=30	rt='[mdr] -> t1'        omdr it1
+ st=31	rt='[t1] + [r] -> q'    rac=3 ib oa oadder
+ st=32  rt='[q] -> mar,t3'      oq imar it3
+	nst=28
+
+*** Absolute ***
+ st=33	rt='[mdr] -> mar,t3'	omdr imar it3
+	nst=28
+
+
+*** fetch 2nd word ***
+ st=34  rt='[pc]->mar'	         imar rac=1 rn=3
+ st=35  rt='[[mar]]->mdr'        read
+ st=36  rt='[pc]+1 ->q'	         rac=1 rn=3 ib p1 oadder
+ st=37  rt='[q] -> pc'           oq wac=1 wn=3
+        cond='ir64'   value=4 nst=30
+        cond='ir64'   value=5 nst=33  
+        nst=100
+
+
+
+
+
+*** check single or double ***
+ st=38
+*** single ***
+        cond='ir1512'   value=0 nst=39
+*** double ADD SUB MOVE ***
+        cond='ir1512'   value=1 nst=62
+        cond='ir1512'   value=2 nst=73
+        cond='ir1512'   value=3 nst=84
+
+*** check INC or DEC or NEG ***
+ st=39
+        cond='ir118'    value=2 nst=40
+        cond='ir118'    value=3 nst=47
+        cond='ir118'    value=4 nst=55
+
+
+*** INC execution cycle ***
+ st=40  rt='[t2]+1->q'          ot2 ib p1 oadder newv newc
+        cond='ir64'    value=0 nst=46
+ 
+*** Autodecrment Index Indirect Absolute ***
+ st=41  rt='[q] -> mdr'         oq imdr newz newn
+ st=42  rt='[t3] -> mar'        ot3 imar
+ st=43  rt='[mdr] -> [mar]'     write
+        cond='ir64'    value=2 nst=44
+        nst=0
+
+*** Autoincrement ***
+ st=44  rt='[t3] +1 -> q'       ot3 ib p1 oadder
+ st=45  rt='[q] -> r'           oq wac=3
+        nst=0
+
+*** Register ***
+ st=46  rt='[q] -> r'           oq wac=3 newz newn
+        nst=0
+
+
+
+*** DEC execution cycle ***
+ st=47  rt='[t2] -> t1'         ot2 it1
+ st=48  rt='[t1] - 1 -> q'      oa comp oadder newv newc
+        cond='ir64'    value=0 nst=54
+ 
+*** Autodecrment Index Indirect Absolute ***
+ st=49  rt='[q] -> mdr'         oq imdr newz newn
+ st=50  rt='[t3] -> mar'        ot3 imar
+ st=51  rt='[mdr] -> [mar]'     write
+        cond='ir64'    value=2 nst=52
+        nst=0
+
+*** Autoincrement ***
+ st=52  rt='[t3] +1 -> q'       ot3 ib p1 oadder
+ st=53  rt='[q] -> r'           oq wac=3
+        nst=0
+	
+*** Register ***
+ st=54  rt='[q] -> r'           oq wac=3 newz newn
+        nst=0
+
+
+
+*** NEG execution cycle ***
+ st=55  rt='-[t2] -> q'         ot2 ib comp p1 oadder newv newc
+        cond='ir64'   value=0 nst=61
+
+*** Autodecrment Index Indirect Absolute ***
+ st=56  rt='[q] -> mdr'         oq imdr newz newn
+ st=57  rt='[t3] -> mar'        ot3 imar
+ st=58  rt='[mdr] -> [mar]'     write
+        cond='ir64'    value=2 nst=59
+        nst=0
+
+*** Autoincrement ***
+ st=59  rt='[t3] +1 -> q'	ot3 ib p1 oadder
+ st=60  rt='[q] -> r'           oq wac=3 
+        nst=0
+
+*** Register ***
+ st=61  rt='[q] -> r'           oq wac=3 newz newn
+        nst=0
+
+
+
+*** ADD execution cycle ***
+ st=62  rt='[t2]->t1'           ot2 it1
+ st=63  rt='[t1]+[t4] -> q'     ot4 ib oa oadder newv newc
+        cond='ir64'   value=0 nst=72
+ st=64  rt='[q]->mdr'           oq imdr newz newn
+ st=65  rt='[t3]->mar'          ot3 imar
+ st=66  rt='[mar]->[mar]'       write
+        cond='ir108'   value=2 nst=68
+ st=67
+        cond='ir64'    value=2 nst=70
+        nst=0
+
+*** ADD Increment ***
+ st=68  rt='[t5]+1->q'        ot5 ib p1 oadder
+ st=69  rt='[q]->r'           oq wac=2
+        nst=67
+ st=70  rt='[t3]+1->q'        ot3 ib p1 oadder
+ st=71  rt='[q]->r'           oq wac=3
+        nst=0
+*** ADD Register ***
+ st=72  rt='[q]->r'           oq wac=3 newz newn
+        cond='ir108'   value=2 nst=68
+        nst=0
+
+
+
+
+
+*** SUB execution cycle ***
+ st=73  rt='[t2]->t1'           ot2 it1
+ st=74  rt='[t1]-[t4] -> q'     ot4 ib comp p1 oa oadder newv newc
+        cond='ir64'    value=0 nst=83
+ st=75  rt='[q]->mdr'           oq imdr newz newn
+ st=76  rt='[t3]->mar'          ot3 imar
+ st=77  rt='[mar]->[mar]'       write
+        cond='ir108'   value=2 nst=79
+ st=78
+        cond='ir64'    value=2 nst=81
+        nst=94
+
+*** SUB Increment ***
+ st=79  rt='[t5]+1->q'        ot5 ib p1 oadder
+ st=80  rt='[q]->r'           oq wac=2
+        nst=78
+ st=81  rt='[t3]+1->q'        ot3 ib p1 oadder
+ st=82  rt='[q]->r'           oq wac=3
+        nst=94
+*** SUB Register ***
+ st=83  rt='[q]->r'           oq wac=3 newz newn 
+        cond='ir108'   value=2 nst=79
+        nst=94
+
+
+
+*** MOVE execution cycle ***
+ st=84  
+        cond='ir64'   value=0 nst=93
+ st=85  rt='[t4]->mdr'          ot4 imdr newz newn
+ st=86  rt='[t3]->mar'          ot3 imar
+ st=87  rt='[mar]->[mar]'       write clrv clrc
+        cond='ir108'   value=2 nst=89
+ st=88
+        cond='ir64'    value=2 nst=91
+        nst=0
+
+*** MOVE Increment ***
+ st=89  rt='[t5]+1->q'        ot5 ib p1 oadder
+ st=90  rt='[q]->r'           oq wac=2
+        nst=88
+ st=91  rt='[t3]+1->q'        ot3 ib p1 oadder
+ st=92  rt='[q]->r'           oq wac=3
+        nst=0
+
+*** MOVE Register ***
+ st=93  rt='[t4]->r'           ot4 wac=3 newz newn clrv clrc
+        cond='ir108'   value=2 nst=89
+        nst=0
+
+
+*** C ***
+ st=94  
+        cond='c'   value=0 nst=96
+ st=95  rt='0->c'   clrc
+        nst=0
+ st=96  rt='1->c'   setc
+        nst=0
+
+
+*** HALT execution cycle ***
+ st=100 halt
+
